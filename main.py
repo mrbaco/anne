@@ -45,7 +45,7 @@ def main():
     if not Stages.stages[stage]['auth_required'] or session_state['authed']:
         Stages.stages[stage]['method'](request, response)
 
-    response['session_state'] = session_state
+    response['session_state'] = {**session_state, **response['session_state']}
 
     return json.dumps(
         response,
