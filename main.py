@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 @app.route("/", methods=["POST"])
 def main():
-    session_state = request.json['state']['session']
+    session_state = request.json['state']['session'] if "state" in request.json else []
     command = request.json['command']
 
     response = {
