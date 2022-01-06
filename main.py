@@ -1,26 +1,15 @@
-# coding: utf-8
-# Импортирует поддержку UTF-8.
-from __future__ import unicode_literals
 
-# Импортируем модули для работы с JSON и логами.
-import json
-import logging
-
-# Импортируем подмодули Flask для запуска веб-сервиса.
 from flask import Flask, request
+import json
+
+from stages import Stages
+
 app = Flask(__name__)
 
-
-logging.basicConfig(level=logging.DEBUG)
-
-# Хранилище данных о сессиях.
-sessionStorage = {}
-
-# Задаем параметры приложения Flask.
-@app.route("/", methods=['POST'])
+@app.route("/", methods=["POST"])
 def main():
-# Функция получает тело запроса и возвращает ответ.
-    logging.info('Request: %r', request.json)
+    session_state = request.json['state']['session']
+    command = request.json['command']
 
     response = {
         "version": request.json['version'],
@@ -30,9 +19,31 @@ def main():
         }
     }
 
-    handle_dialog(request.json, response)
+    stage = abs(session_state['stage']) if "stage" in session_state else 0
+    stage = stage if stage <= len(Stages.order) else 0
 
-    logging.info('Response: %r', response)
+    if Stages.order[stage] in Stages.authRequired:
+        if not "authed" in session_state:
+            if not "code_phrase" in session_state:
+                session_state['code_phrase'] = create_code_phrase()
+                response['response']['text'] = (
+                    "Записала. Нужно подтверждение. Вопрос: %s" %
+                        session_state['code_phrase']
+                )
+            else:
+                if auth(session_state['code_phrase'], command):
+                    session_state['authed'] = True
+                else:
+                    session_state['code_phrase'] = create_code_phrase()
+                    response['response']['text'] = (
+                        "Неправильный ответ. Попробуем ещё раз. Вопрос: %s" %
+                            session_state['code_phrase']
+                    )
+
+    if not Stages.order[stage] in Stages.authRequired or session_state['authed']:
+        Stages.order[stage](request, response)
+
+    response['session_state'] = session_state
 
     return json.dumps(
         response,
@@ -40,67 +51,12 @@ def main():
         indent=2
     )
 
-# Функция для непосредственной обработки диалога.
-def handle_dialog(req, res):
-    user_id = req['session']['user_id']
+def auth(expected, actual):
+    return True
 
-    if req['session']['new']:
-        # Это новый пользователь.
-        # Инициализируем сессию и поприветствуем его.
+def create_code_phrase():
+    return "code_phrase"
 
-        sessionStorage[user_id] = {
-            'suggests': [
-                "Не хочу.",
-                "Не буду.",
-                "Отстань!",
-            ]
-        }
 
-        res['response']['text'] = 'Привет! Купи слона!'
-        res['response']['buttons'] = get_suggests(user_id)
-        return
-
-    # Обрабатываем ответ пользователя.
-    if req['request']['original_utterance'].lower() in [
-        'ладно',
-        'куплю',
-        'покупаю',
-        'хорошо',
-    ]:
-        # Пользователь согласился, прощаемся.
-        res['response']['text'] = 'Слона можно найти на Яндекс.Маркете!'
-        return
-
-    # Если нет, то убеждаем его купить слона!
-    res['response']['text'] = 'Все говорят "%s", а ты купи слона!' % (
-        req['request']['original_utterance']
-    )
-    res['response']['buttons'] = get_suggests(user_id)
-
-# Функция возвращает две подсказки для ответа.
-def get_suggests(user_id):
-    session = sessionStorage[user_id]
-
-    # Выбираем две первые подсказки из массива.
-    suggests = [
-        {'title': suggest, 'hide': True}
-        for suggest in session['suggests'][:2]
-    ]
-
-    # Убираем первую подсказку, чтобы подсказки менялись каждый раз.
-    session['suggests'] = session['suggests'][1:]
-    sessionStorage[user_id] = session
-
-    # Если осталась только одна подсказка, предлагаем подсказку
-    # со ссылкой на Яндекс.Маркет.
-    if len(suggests) < 2:
-        suggests.append({
-            "title": "Ладно",
-            "url": "https://market.yandex.ru/search?text=слон",
-            "hide": True
-        })
-
-    return suggests
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run()
