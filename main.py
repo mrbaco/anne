@@ -17,7 +17,8 @@ def main():
         "session": request.json['session'],
         "response": {
             "end_session": False
-        }
+        },
+        "session_state": {}
     }
 
     stage = abs(session_state['stage']) if "stage" in session_state else 0
