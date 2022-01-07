@@ -35,8 +35,8 @@ class Auth:
         
         word1_index = words1.index(word1)
         word2_index = words2.index(word2)
-
-        minute = datetime.datetime.minute - 1
+        
+        minute = datetime.datetime.now().minute - 1
         shift = minute // 20
 
         answer1_index = (word1_index + 1) * -1 - shift
