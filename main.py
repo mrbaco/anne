@@ -45,7 +45,7 @@ def main():
                             session['code_phrase']
                     )
 
-    if not Stages.stages[stage]['auth_required'] or session['authed']:
+    if not Stages.stages[stage]['auth_required'] or session.get("authed", False):
         Stages.stages[stage]['method'](request, response, session)
 
     if response['response']['end_session']:
