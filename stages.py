@@ -1,13 +1,13 @@
 
-def init(request, response):
+def init(request, response, session):
     response['response']['text'] = request.json.get("request", {}).get("command", "") + " - init"
-    response['session_state']['stage'] = 1
+    session['stage'] = 1
 
-def dateTimeClarification(request, response):
+def dateTimeClarification(request, response, session):
     response['response']['text'] = request.json.get("request", {}).get("command", "") + " - dateTimeClarification"
-    response['session_state']['stage'] = 2
+    session['stage'] = 2
 
-def successResult(request, response):
+def successResult(request, response, session):
     response['response']['text'] = request.json.get("request", {}).get("command", "") + " - successResult"
     response['response']['end_session'] = True
 
