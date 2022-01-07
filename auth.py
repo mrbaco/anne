@@ -1,6 +1,5 @@
 
 import secrets
-import datetime
 
 words1 = [
     "красный",
@@ -35,11 +34,8 @@ class Auth:
         
         word1_index = words1.index(word1)
         word2_index = words2.index(word2)
-        
-        minute = datetime.datetime.now().minute - 1
-        shift = minute // 20
 
-        answer1_index = (word1_index + 1) * -1 - shift
-        answer2_index = (word2_index + 1) * -1 - shift
+        answer1_index = (word1_index + 1) * -1
+        answer2_index = (word2_index + 1) * -1
 
         return answer == "%s %s" % (words1[answer1_index], words2[answer2_index])
