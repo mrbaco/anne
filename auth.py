@@ -27,7 +27,7 @@ words2 = [
 class Auth:
     @staticmethod
     def create_code_phrase():
-        return "%s %s" % secrets.choice(words1), secrets.choice(words2)
+        return "%s %s" % (secrets.choice(words1), secrets.choice(words2))
 
     @staticmethod
     def check(question, answer):
@@ -42,4 +42,4 @@ class Auth:
         answer1_index = (word1_index + 1) * -1 - shift
         answer2_index = (word2_index + 1) * -1 - shift
 
-        return answer == "%s %s" % words1[answer1_index], words2[answer2_index]
+        return answer == "%s %s" % (words1[answer1_index], words2[answer2_index])
