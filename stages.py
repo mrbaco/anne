@@ -8,7 +8,7 @@ def getDatetimeEntity(request):
         request['request']['nlu']['entities']
     ))
 
-    if datetime_entities.count() != 1:
+    if len(datetime_entities) != 1:
         return None
     
     return dict(datetime_entities[0]).get("value", None)
