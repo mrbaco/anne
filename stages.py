@@ -71,6 +71,7 @@ def approveTime(request, response, session):
     
     # Осуществляем расчёт времени по относительным и абсолютным величинам
     current_datetime = datetime.datetime.utcnow() + datetime.timedelta(hours=3)
+    current_datetime = current_datetime.replace(minute=0, second=0, microsecond=0)
     
     if "day_is_relative" in order_datetime and "day" in order_datetime:
         if order_datetime['day_is_relative']:
@@ -83,6 +84,12 @@ def approveTime(request, response, session):
             current_datetime += datetime.timedelta(hours=order_datetime['hour'])
         else:
             current_datetime = current_datetime.replace(hour=order_datetime['hour'])
+    
+    if "minute_is_relative" in order_datetime and "minute" in order_datetime:
+        if order_datetime['minute_is_relative']:
+            current_datetime += datetime.timedelta(minutes=order_datetime['minute'])
+        else:
+            current_datetime = current_datetime.replace(minute=order_datetime['minute'])
     
     # Сохраняем расчитанную дату и переходим на следующий этап
     session['datetime'] = current_datetime
