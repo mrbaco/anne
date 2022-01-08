@@ -42,6 +42,8 @@ def approveTime(request, response, session):
     if session['datetime'] == None:
         response['response']['text'] = ("Не смогла определить дату и время " + 
             "для создания заявки. Пожалуйста, повторите.")
+        session['datetime_entity'] = None
+
         return
     
     order_datetime = dict(session['datetime'])
@@ -49,16 +51,23 @@ def approveTime(request, response, session):
     if order_datetime.get("day", None) == None:
         response['response']['text'] = ("Не смогла определить дату " + 
             "для создания заявки. Пожалуйста, повторите.")
+        session['datetime_entity'] = None
+        
         return
     
     if order_datetime.get("hour", None) == None:
         response['response']['text'] = ("Не смогла определить время " + 
             "для создания заявки. Пожалуйста, повторите.")
+        session['datetime_entity'] = None
+        
         return
 
     if order_datetime.get("day", 0) < 1:
         response['response']['text'] = ("Нельзя отправить заказ в прошлое. " +
             "Пожалуйста, повторите.")
+        session['datetime_entity'] = None
+        
+        return
     
     # Осуществляем расчёт времени по относительным и абсолютным величинам
     current_datetime = datetime.datetime.utcnow() + datetime.timedelta(hours=3)
