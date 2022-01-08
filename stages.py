@@ -35,8 +35,9 @@ def dateTimeClarification(request, response, session):
 
 def approveTime(request, response, session):
     # Проверяем корректность заполнения даты и времени
-    session['datetime'] = (getDatetimeEntity(request.json) if session['datetime_entity'] == None
-        else session['datetime'])
+    session['datetime'] = (getDatetimeEntity(request.json) if "datetime_entity" 
+        in session and session['datetime_entity'] == None
+            else session['datetime'])
     
     if session['datetime'] == None:
         response['response']['text'] = ("Не смогла определить дату и время " + 
