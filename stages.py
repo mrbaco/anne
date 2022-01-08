@@ -15,7 +15,7 @@ def getDatetimeEntity(request):
 
 def init(request, response, session):
     # Проверить наличие даты в request.nlu.entities
-    datetime_entity = getDatetimeEntity(request)
+    datetime_entity = getDatetimeEntity(request.json)
     session['datetime'] = datetime_entity
 
     # Если даты нет - вызываем dateTimeClarification
@@ -35,7 +35,7 @@ def dateTimeClarification(request, response, session):
 
 def approveTime(request, response, session):
     # Проверяем корректность заполнения даты и времени
-    session['datetime'] = (getDatetimeEntity(request) if session['datetime_entity'] == None
+    session['datetime'] = (getDatetimeEntity(request.json) if session['datetime_entity'] == None
         else session['datetime'])
     
     if session['datetime'] == None:
