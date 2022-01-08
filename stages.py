@@ -76,13 +76,13 @@ def approveTime(request, response, session):
         if order_datetime['day_is_relative']:
             current_datetime += datetime.timedelta(days=order_datetime['day'])
         else:
-            current_datetime.replace(day=order_datetime['day'])
+            current_datetime = current_datetime.replace(day=order_datetime['day'])
 
     if "hour_is_relative" in order_datetime and "hour" in order_datetime:
         if order_datetime['hour_is_relative']:
             current_datetime += datetime.timedelta(hours=order_datetime['hour'])
         else:
-            current_datetime.replace(hour=order_datetime['hour'])
+            current_datetime = current_datetime.replace(hour=order_datetime['hour'])
     
     # Сохраняем расчитанную дату и переходим на следующий этап
     session['datetime'] = current_datetime
